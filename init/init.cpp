@@ -563,12 +563,12 @@ static int queue_property_triggers_action(const std::vector<std::string>& args)
     return 0;
 }
 
-static void selinux_init_all_handles(void)
+/*static void selinux_init_all_handles(void)
 {
     sehandle = selinux_android_file_context_handle();
     selinux_android_set_sehandle(sehandle);
     sehandle_prop = selinux_android_prop_context_handle();
-}
+}*/
 
 enum selinux_enforcing_status { SELINUX_PERMISSIVE, SELINUX_ENFORCING };
 
@@ -905,7 +905,7 @@ static void selinux_initialize(bool in_kernel_domain) {
         // init's first stage can't set properties, so pass the time to the second stage.
         setenv("INIT_SELINUX_TOOK", std::to_string(t.duration().count()).c_str(), 1);
     } else {
-        selinux_init_all_handles();
+        //selinux_init_all_handles();
     }
 }
 
@@ -914,7 +914,7 @@ static void selinux_initialize(bool in_kernel_domain) {
 // value. This must happen before /dev is populated by ueventd.
 static void selinux_restore_context() {
     LOG(INFO) << "Running restorecon...";
-    selinux_android_restorecon("/dev", 0);
+    /*selinux_android_restorecon("/dev", 0);
     selinux_android_restorecon("/dev/kmsg", 0);
     selinux_android_restorecon("/dev/socket", 0);
     selinux_android_restorecon("/dev/random", 0);
@@ -942,6 +942,7 @@ static void selinux_restore_context() {
 
     selinux_android_restorecon("/sbin/mkfs.f2fs", 0);
     selinux_android_restorecon("/sbin/sload.f2fs", 0);
+    */
 }
 
 // Set the UDC controller for the ConfigFS USB Gadgets.
@@ -1046,13 +1047,13 @@ int main(int argc, char** argv) {
         SetInitAvbVersionInRecovery();
 
         // Set up SELinux, loading the SELinux policy.
-        selinux_initialize(true);
+        //selinux_initialize(true);
 
         // We're in the kernel domain, so re-exec init to transition to the init domain now
         // that the SELinux policy has been loaded.
         if (selinux_android_restorecon("/init", 0) == -1) {
             PLOG(ERROR) << "restorecon failed";
-            security_failure();
+            //security_failure();
         }
 
         setenv("INIT_SECOND_STAGE", "true", 1);
@@ -1068,7 +1069,7 @@ int main(int argc, char** argv) {
         // execv() only returns if an error happened, in which case we
         // panic and never fall through this conditional.
         PLOG(ERROR) << "execv(\"" << path << "\") failed";
-        security_failure();
+        //security_failure();
     }
 
     // At this point we're in the second stage of init.
@@ -1096,7 +1097,7 @@ int main(int argc, char** argv) {
 
     // Make the time that init started available for bootstat to log.
     property_set("ro.boottime.init", getenv("INIT_STARTED_AT"));
-    property_set("ro.boottime.init.selinux", getenv("INIT_SELINUX_TOOK"));
+    //property_set("ro.boottime.init.selinux", getenv("INIT_SELINUX_TOOK"));
 
     // Set libavb version for Framework-only OTA match in Treble build.
     const char* avb_version = getenv("INIT_AVB_VERSION");

@@ -78,6 +78,9 @@ void property_init() {
 
 static bool check_mac_perms(const std::string& name, char* sctx, struct ucred* cr) {
 
+    //Halium always return true for (SELinux) permission check
+    return true;
+    
     if (!sctx) {
       return false;
     }
